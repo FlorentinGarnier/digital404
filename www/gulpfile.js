@@ -19,11 +19,21 @@ const uglify = require('gulp-uglify');
 const pump = require('pump');
 const imagemin = require('gulp-imagemin');
 
-gulp.task('imagemin', () =>
+gulp.task('images', function () {
     gulp.src(path.images + '/*')
-        .pipe(imagemin())
+        .pipe(imagemin([
+            imagemin.gifsicle({interlaced: true}),
+            imagemin.jpegtran({progressive: true}),
+            imagemin.optipng({optimizationLevel: 1}),
+            imagemin.svgo({
+                plugins: [
+                    {removeViewBox: true},
+                    {cleanupIDs: false}
+                ]
+            })
+        ]))
         .pipe(gulp.dest(path.dest + '/images'))
-);
+});
 
 gulp.task('compress', function(){
     gulp.task('compress', function (cb) {
@@ -48,13 +58,13 @@ gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(path.sass + '/*.scss', ['sass']);
     gulp.watch(path.javascript + '/*.js', ['compress']);
-    gulp.watch(path.images + '/', ['imagemin'])
+    gulp.watch(path.images + '/', ['imagemin']);
     gulp.watch(['./web/**/*.html'], function(files){
         livereload.changed(files);
     })
 });
 
 
-gulp.task('build', ['imagemin', 'compress', "sass"]);
+gulp.task('build', ['images', 'compress', "sass"]);
 
 gulp.task('default', ['build']);

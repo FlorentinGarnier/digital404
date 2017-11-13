@@ -1,2 +1,5 @@
 node_modules/
 web/assets
+/utils/docker/prod/.env
+/utils/docker/prod/data/
+/www/web/assets/
